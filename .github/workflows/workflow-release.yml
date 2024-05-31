@@ -7,38 +7,27 @@ jobs:
       name: Create Release
       runs-on: ubuntu-latest
       steps:
+        - name: Build base image
+          run: |
+            echo $SOURCE_NAME
+            echo $SOURCE_BRANCH
+            echo $SOURCE_TAG
+          env:
+            SOURCE_NAME: ${{ steps.branch_name.outputs.SOURCE_NAME }}
+            SOURCE_BRANCH: ${{ steps.branch_name.outputs.SOURCE_BRANCH }}
+            SOURCE_TAG: ${{ steps.branch_name.outputs.SOURCE_TAG }}
         - name: Create Release
           id: create_release
           uses: actions/create-release@v1
           env:
             GITHUB_TOKEN: ${{ secrets.TOKEN_PULLREQ }} # This token is provided by Actions, you do not need to create your own token
           with:
-            tag_name: "v1.0"
-            release_name: Release ${{ github.event.release.tag_name }} 
+            tag_name: "v1.2"
+            release_name: Release ${{ steps.branch_name.outputs.SOURCE_NAME }}
             body: |
               Changes in this Release
               - Release de PR de main"
-              - Rama ${{ github.ref_name }}
-              - Version: ${{ github.event.release.tag_name }} 
+              - Rama: ${{ steps.branch_name.outputs.SOURCE_BRANCH }}
+              - Version: ${{ steps.branch_name.outputs.SOURCE_TAG }}
             draft: false
             prerelease: false
-    release2:
-        name: Create Release2
-        runs-on: ubuntu-latest
-        steps:
-          - name: Create Release2
-            id: create_release2
-            uses: actions/create-release@v1
-            env:
-              GITHUB_TOKEN: ${{ secrets.TOKEN_PULLREQ }} # This token is provided by Actions, you do not need to create your own token
-            with:
-              tag_name: "v1.1"
-              release_name: Pre-Release ${{ github.event.release.tag_name }}
-              body: |
-                  Changes in this Release
-                  - Release de PR de main
-                  - Rama: ${{ github.ref_name }}
-                  - Version: ${{ github.event.release.tag_name }} 
-                  - Changelog: ${{ github.event.head_commit.message }}
-              draft: false
-              prerelease: true
