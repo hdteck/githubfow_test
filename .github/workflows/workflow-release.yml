@@ -1,0 +1,44 @@
+name: workflow_release
+on:
+  workflow_dispatch:
+  
+jobs:
+    build:
+      name: Create Release
+      runs-on: ubuntu-latest
+      steps:
+        - name: Create Release
+          id: create_release
+          uses: actions/create-release@v1
+          env:
+            GITHUB_TOKEN: ${{ secrets.TOKEN_PULLREQ }} # This token is provided by Actions, you do not need to create your own token
+          with:
+            tag_name: "v1.0"
+            release_name: Release ${{ github.event.release.tag_name }} 
+            body: |
+              Changes in this Release
+              - Release de PR de main"
+              - Rama ${{ github.ref_name }}
+              - Version: ${{ github.event.release.tag_name }} 
+            draft: false
+            prerelease: false
+    release2:
+        name: Create Release2
+        runs-on: ubuntu-latest
+        steps:
+          - name: Create Release2
+            id: create_release2
+            uses: actions/create-release@v1
+            env:
+              GITHUB_TOKEN: ${{ secrets.TOKEN_PULLREQ }} # This token is provided by Actions, you do not need to create your own token
+            with:
+              tag_name: "v1.1"
+              release_name: Pre-Release ${{ github.event.release.tag_name }}
+              body: |
+                  Changes in this Release
+                  - Release de PR de main
+                  - Rama: ${{ github.ref_name }}
+                  - Version: ${{ github.event.release.tag_name }} 
+                  - Changelog: ${{ github.event.head_commit.message }}
+              draft: false
+              prerelease: true
