@@ -7,27 +7,18 @@ jobs:
       name: Create Release
       runs-on: ubuntu-latest
       steps:
-        - name: Build base image
-          run: |
-            echo $SOURCE_NAME
-            echo $SOURCE_BRANCH
-            echo $SOURCE_TAG
-          env:
-            SOURCE_NAME: ${{ steps.branch_name.outputs.SOURCE_NAME }}
-            SOURCE_BRANCH: ${{ steps.branch_name.outputs.SOURCE_BRANCH }}
-            SOURCE_TAG: ${{ steps.branch_name.outputs.SOURCE_TAG }}
-        - name: Create Release
-          id: create_release
-          uses: actions/create-release@v1
-          env:
-            GITHUB_TOKEN: ${{ secrets.TOKEN_PULLREQ }} # This token is provided by Actions, you do not need to create your own token
-          with:
-            tag_name: "v1.2"
-            release_name: Release ${{ steps.branch_name.outputs.SOURCE_NAME }}
-            body: |
-              Changes in this Release
-              - Release de PR de main"
-              - Rama: ${{ steps.branch_name.outputs.SOURCE_BRANCH }}
-              - Version: ${{ steps.branch_name.outputs.SOURCE_TAG }}
-            draft: false
-            prerelease: false
+       - uses: nowsprinting/check-version-format-action@v3
+         id: version
+         with:
+           prefix: 'v'
+        
+       - name: Create release
+         env:
+           GITHUB_TOKEN: ${{ secrets.TOKEN_PULLREQ }}
+         run: |
+           gh release create "${{steps.version.outputs.full}}" \
+            --repo="$GITHUB_REPOSITORY" \
+            --title="Release ${{steps.version.outputs.full_without_prefix}}" \
+            --generate-notes \
+            ${{ steps.version.outputs.is_stable != 'true' && '--prerelease' || '' }}
+         shell: bash
