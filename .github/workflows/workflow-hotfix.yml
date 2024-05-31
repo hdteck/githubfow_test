@@ -22,6 +22,7 @@ jobs:
             message: Merge hotfix into main
             github_token: ${{ secrets.TOKEN_PULLREQ }}
     delete-branch:
+      needs: 'merge-branch'
       runs-on: ubuntu-latest
       steps:
          - name: delete branch
