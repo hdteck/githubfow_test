@@ -1,0 +1,32 @@
+# This is a basic workflow to help you get started with Actions
+
+name: workflow-feature
+
+# Controls when the workflow will run
+on:
+
+  pull_request:
+    branches:
+    - feature
+
+jobs:
+    merge-branch:
+      runs-on: ubuntu-latest
+      steps:
+    
+       - name: Merge release_1 -> main
+         uses: devmasx/merge-branch@master
+         with:
+            type: now
+            from_branch: feature
+            target_branch: main
+            message: Merge feature into main
+            github_token: ${{ secrets.TOKEN_PULLREQ }}
+    delete-branch:
+      needs: 'merge-branch'
+      runs-on: ubuntu-latest
+      steps:
+         - name: delete branch
+           uses: SvanBoxel/delete-merged-branch@main
+           env:
+                GITHUB_TOKEN: ${{ secrets.TOKEN_PULLREQ }}       
